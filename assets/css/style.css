@@ -254,20 +254,29 @@ mark{background:var(--paper-2);color:inherit;padding:0 .2em}
 .career-detail{margin-top:1rem;min-height:3.2em;color:var(--soft);max-width:44rem}
 .career-detail b{color:var(--ink);font-weight:400}
 
-/* Aufdecken */
-.js [data-rv="line"]{overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
-.js [data-rv="line"] .rv-in{display:inline-block;transform:translateY(110%);transition:transform 1.1s cubic-bezier(.2,.75,.15,1)}
-.js [data-rv="line"].in .rv-in{transform:none}
-.js [data-rv="fade"]{opacity:0;transform:translateY(28px);transition:opacity 1s ease .1s,transform 1.1s cubic-bezier(.2,.75,.15,1) .1s}
-.js [data-rv="fade"].in{opacity:1;transform:none}
-.js [data-rv="floors"] li{transform:scaleY(0);transform-origin:50% 100%;transition:transform .9s cubic-bezier(.2,.75,.15,1) calc(var(--i) * 80ms)}
-.js [data-rv="floors"] li>*{opacity:0;transition:opacity .5s ease calc(var(--i) * 80ms + .5s)}
-.js [data-rv="floors"].in li{transform:none}
-.js [data-rv="floors"].in li>*{opacity:1}
-.js [data-rv="curtain"]{clip-path:inset(0 0 100% 0);transition:clip-path 1.3s cubic-bezier(.7,0,.2,1)}
-.js [data-rv="curtain"].in{clip-path:inset(0 0 0 0)}
-.js .career[data-rv] .career-bar li{transform:scaleX(0);transform-origin:0 50%;transition:transform .8s cubic-bezier(.2,.75,.15,1) calc(var(--i) * 90ms)}
-.js .career[data-rv].in .career-bar li{transform:none}
+/* Hover */
+.lph-row li{position:relative;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,background-color .25s}
+@media (hover:hover){
+  .lph-row li:hover{transform:translateY(-6px);box-shadow:0 18px 30px -18px rgba(30,24,18,.45);z-index:1}
+  .lph-row .own:hover{background:var(--ink)}
+  .lph-row .partner:hover{background:var(--land-hl)}
+  .svc{transition:background-color .3s}
+  .svc h3{display:inline-block;background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;padding-bottom:.15rem;transition:background-size .45s cubic-bezier(.2,.7,.2,1)}
+  .svc:hover h3{background-size:100% 1px}
+  .svc p{transition:color .3s}
+  .svc:hover p{color:var(--ink)}
+  .portrait{overflow:hidden}
+  .portrait img{transition:transform 1.2s cubic-bezier(.2,.7,.2,1),filter .6s}
+  .portrait:hover img{transform:scale(1.03);filter:contrast(1.06)}
+  .facts-inline>div{transition:transform .3s}
+  .facts-inline>div:hover{transform:translateX(4px)}
+  .ort-list button{transition:color .2s,transform .25s}
+  .ort-list button:hover{transform:translateX(4px)}
+  .career-bar button{transition:background .25s,color .25s,transform .3s cubic-bezier(.2,.7,.2,1)}
+  .career-bar li:not(.gap) button:hover{transform:translateY(-4px)}
+  .filters button{transition:color .2s,border-color .2s}
+  .pj-facts dd{transition:color .2s}
+}
 
 /* Kontakt */
 .kontakt{position:relative;isolation:isolate;margin-top:clamp(6rem,12vw,10rem);background:var(--night) url(../img/bg-kontakt-warm.webp) center/cover;color:var(--on-dark)}
@@ -293,8 +302,7 @@ body.home .foot a:hover{color:#fff}
 .pj h1{font-size:clamp(2.6rem,6.5vw,6.2rem);letter-spacing:-.025em;line-height:.98}
 .pj-meta{color:var(--soft);font-size:1rem;text-align:right}
 .pj-cover{position:relative;height:min(82vh,62vw);overflow:hidden;cursor:zoom-in;background:var(--land)}
-.pj-cover img{width:100%;height:100%;object-fit:cover;animation:settle 1.8s cubic-bezier(.2,.7,.2,1) both}
-@keyframes settle{from{transform:scale(1.06);opacity:.4}to{transform:none;opacity:1}}
+.pj-cover img{width:100%;height:100%;object-fit:cover}
 .pj-body{display:grid;grid-template-columns:minmax(16rem,.6fr) minmax(0,1fr);gap:2rem clamp(2rem,6vw,6rem);padding:clamp(3rem,6vw,5rem) var(--gut)}
 .pj-facts{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.6rem 1.5rem;font-size:.95rem;align-content:start;position:sticky;top:calc(var(--top) + 1.5rem)}
 .pj-facts dt{color:var(--soft)}
@@ -421,5 +429,4 @@ body.home .foot a:hover{color:#fff}
   .stage .photo{opacity:1}
   .lines{display:none}
   .cursor,.scroll-hint{display:none}
-  .js [data-rv],.js [data-rv] *,.x-none{clip-path:none!important;opacity:1!important;transform:none!important}
 }

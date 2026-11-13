@@ -5,6 +5,7 @@
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
   var img = function (k) { return (window.BILDER && window.BILDER[k]) || "assets/img/" + k + ".webp"; };
+  var thumb = function (k) { return (window.BILDER && (window.BILDER["thumb/" + k] || window.BILDER[k])) || "assets/img/thumb/" + k + ".webp"; };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
   var ease = function (k) { return k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; };
@@ -81,14 +82,7 @@
     return { kick: kick };
   })();
 
-  /* ---------------- Aufdecken beim Scrollen ---------------- */
-  $$('[data-rv="line"]').forEach(function (h) { h.innerHTML = '<span class="rv-in">' + h.innerHTML + "</span>"; });
-  $$('[data-rv="floors"] li').forEach(function (li, i) { li.style.setProperty("--i", i); });
-  var rvIO = new IntersectionObserver(function (es) {
-    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); rvIO.unobserve(e.target); } });
-  }, { rootMargin: "0px 0px -10% 0px" });
-  function observeReveals(root) { $$("[data-rv]", root).forEach(function (el) { if (!el.classList.contains("in")) rvIO.observe(el); }); }
-  observeReveals(document);
+  function observeReveals() {}   // keine Eingangsanimationen
 
   /* ---------------- Tiefe: Bilder bewegen sich langsamer als die Seite ---------------- */
   var Par = (function () {
@@ -130,7 +124,7 @@
       }
       out.push('<div class="sheet-row" style="grid-template-columns:' + cols.join(" ") + '">' + items.map(function (p, j) {
         return '<a class="tile" href="#projekt/' + p.slug + '" data-i="' + shown.indexOf(p) + '">' +
-          '<span class="tile-img" data-par style="aspect-ratio:' + ars[j] + '"><img src="' + img(p.bilder[0]) + '" alt="" loading="lazy"></span>' +
+          '<span class="tile-img" data-par style="aspect-ratio:' + ars[j] + '"><img src="' + thumb(p.bilder[0]) + '" alt="" decoding="async"' + (shown.indexOf(p) < 8 ? "" : ' loading="lazy"') + "></span>" +
           '<span class="tile-cap"><span class="tile-t">' + esc(p.titel) + '</span><span class="tile-m">' + (p.ort === "Ort folgt" ? "" : esc(p.ort)) + "</span></span></a>";
       }).join("") + (items.length < per ? '<span class="tile-fill"></span>' : "") + "</div>");
     }
@@ -148,6 +142,10 @@
   var lastPer = perRow();
   addEventListener("resize", function () { if (perRow() !== lastPer) { lastPer = perRow(); renderSheet(true); } });
   renderFilters(); renderSheet(false);
+  addEventListener("load", function () {
+    var go = function () { $$("img[loading=lazy]", sheet).forEach(function (im) { im.loading = "eager"; }); };
+    "requestIdleCallback" in window ? requestIdleCallback(go, { timeout: 1500 }) : setTimeout(go, 600);
+  });
 
   // Handy: Zähler und Fortschritt der Wisch-Galerie
   (function () {
@@ -205,7 +203,7 @@
       pre.src = src;
       $$("button", thumbs).forEach(function (b, j) { b.setAttribute("aria-current", j === k); });
     }
-    function peek(btn, p, label) { $("img", btn).src = img(p.bilder[0]); $(".pk-t span", btn).textContent = p.titel; btn.setAttribute("aria-label", label + " Projekt: " + p.titel); }
+    function peek(btn, p, label) { $("img", btn).src = thumb(p.bilder[0]); $(".pk-t span", btn).textContent = p.titel; btn.setAttribute("aria-label", label + " Projekt: " + p.titel); }
     function fill() {
       var p = shown[idx], nx = shown[(idx + 1) % shown.length], pv = shown[(idx - 1 + shown.length) % shown.length];
       imgs = bilder(p);
@@ -220,7 +218,7 @@
       $(".pv-next span", el).textContent = nx.titel;
       el.classList.toggle("single", shown.length < 2);
       peek(pkL, pv, "Vorheriges"); peek(pkR, nx, "Nächstes");
-      thumbs.innerHTML = imgs.length > 1 ? imgs.map(function (k, j) { return '<button type="button" aria-label="Bild ' + (j + 1) + '"><img src="' + img(k) + '" alt=""></button>'; }).join("") : "";
+      thumbs.innerHTML = imgs.length > 1 ? imgs.map(function (k, j) { return '<button type="button" aria-label="Bild ' + (j + 1) + '"><img src="' + thumb(k) + '" alt=""></button>'; }).join("") : "";
       setImg(0);
     }
     function go(d) {
@@ -336,20 +334,7 @@
     listBtns.forEach(function (b) { bind(b, +b.dataset.i); });
     document.addEventListener("click", function () { if (active > -1) hide(); });
 
-    // Verbindungen vom Büro aus, einmal beim Erscheinen
-    var routes = $$(".route", svg);
-    if (reduce) return;
-    routes.forEach(function (p) { p.style.strokeDasharray = "1"; p.style.strokeDashoffset = "1"; });
-    var io = new IntersectionObserver(function (es) {
-      if (!es[0].isIntersecting) return;
-      routes.forEach(function (p, i) {
-        p.style.transition = "stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1) " + (0.2 + i * 0.05).toFixed(2) + "s";
-        p.style.strokeDashoffset = "0";
-      });
-      setTimeout(function () { routes.forEach(function (p) { p.style.strokeDasharray = ""; p.style.strokeDashoffset = ""; p.style.transition = ""; p.removeAttribute("pathLength"); p.classList.add("done"); }); }, 2800);
-      io.disconnect();
-    }, { threshold: 0.35 });
-    io.observe(wrap);
+    $$(".route", svg).forEach(function (p) { p.removeAttribute("pathLength"); p.classList.add("done"); });
   })();
 
   /* ---------------- Werdegang ---------------- */
@@ -388,7 +373,7 @@
     var rest = p.bilder.slice(1);
     var gallery = rest.map(function (k, j) {
       var a = AR[k] || 1.4, cls = (rest.length % 2 === 1 && j === 0) ? "wide" : a < 1 ? "tall" : "";
-      return '<figure class="' + cls + '" data-rv="curtain"><span class="g-in" data-par><img src="' + img(k) + '" alt="' + esc(p.titel) + ", Ansicht " + (j + 2) + '" loading="lazy" data-lb="' + (j + 1) + '"></span></figure>';
+      return '<figure class="' + cls + '"><span class="g-in" data-par><img src="' + img(k) + '" alt="' + esc(p.titel) + ", Ansicht " + (j + 2) + '" loading="lazy" data-lb="' + (j + 1) + '"></span></figure>';
     }).join("");
     var variants = "";
     if (p.varianten) {
@@ -400,11 +385,11 @@
     view.innerHTML =
       '<article class="pj">' +
         '<header class="pj-head"><a class="pj-back" href="#projekte">Alle Projekte</a>' +
-          '<h1 data-rv="line"><span class="rv-in">' + esc(p.titel) + "</span></h1>" +
+          '<h1>' + esc(p.titel) + "</h1>" +
           '<p class="pj-meta">' + (p.ort === "Ort folgt" ? "" : esc(p.ort) + "<br>") + esc(p.nutzung) + (p.zeitraum ? ", " + esc(p.zeitraum) : "") + "</p></header>" +
         (p.varianten ? variants : '<div class="pj-cover"><img src="' + img(p.bilder[0]) + '" alt="' + esc(p.titel) + '" data-lb="0"></div>') +
         '<div class="pj-body"><dl class="pj-facts">' + facts.map(function (f) { return "<dt>" + f[0] + "</dt><dd>" + esc(f[1]) + "</dd>"; }).join("") + "</dl>" +
-          '<div class="pj-text" data-rv="fade">' + p.text.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("") +
+          '<div class="pj-text">' + p.text.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("") +
           (p.pruefen ? '<p class="pj-note">Entwurfsstand: Angaben und Bildrechte werden mit Witold Kondera abgestimmt.</p>' : "") + "</div></div>" +
         (gallery ? '<div class="gallery">' + gallery + "</div>" : "") +
         '<a class="pj-next" href="#projekt/' + nx.slug + '"><span>Nächstes Projekt</span><strong>' + esc(nx.titel) + "</strong></a>" +
