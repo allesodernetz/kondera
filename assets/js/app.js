@@ -129,13 +129,12 @@
         cols.push("minmax(0," + (avg * (per - items.length)).toFixed(2) + "fr)");
       }
       out.push('<div class="sheet-row" style="grid-template-columns:' + cols.join(" ") + '">' + items.map(function (p, j) {
-        return '<a class="tile' + (instant ? " in" : "") + '" data-rv="tile" style="--j:' + j + '" href="#projekt/' + p.slug + '" data-i="' + shown.indexOf(p) + '">' +
+        return '<a class="tile" href="#projekt/' + p.slug + '" data-i="' + shown.indexOf(p) + '">' +
           '<span class="tile-img" data-par style="aspect-ratio:' + ars[j] + '"><img src="' + img(p.bilder[0]) + '" alt="" loading="lazy"></span>' +
           '<span class="tile-cap"><span class="tile-t">' + esc(p.titel) + '</span><span class="tile-m">' + (p.ort === "Ort folgt" ? "" : esc(p.ort)) + "</span></span></a>";
       }).join("") + (items.length < per ? '<span class="tile-fill"></span>' : "") + "</div>");
     }
     sheet.innerHTML = out.join("");
-    if (!instant) observeReveals(sheet);
     Par.watch(sheet); Par.kick();
   }
   $(".filters").addEventListener("click", function (e) {
