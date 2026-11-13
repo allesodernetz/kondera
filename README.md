@@ -10,6 +10,8 @@ Statische Website für GitHub Pages. Kein Build-Schritt nötig: Ordner hochladen
 - `assets/js/hero-lines.js` – die Linien der Hero-Animation, aus dem Rendering berechnet
 - `assets/js/europa.js` – Europakarte als vorberechnete Pfade
 - `assets/img/` – Bilder als WebP (max. 2000 px)
+- `assets/img/thumb/` – Vorschaubilder für Kacheln und Miniaturen (max. 1200 px)
+- `assets/img/m/` – Titelbilder im Hochformat 4:5 für die Wisch-Galerie auf dem Handy (1000 × 1250 px)
 - `assets/fonts/` – Jost, lokal eingebunden (keine Google-Fonts-Anfrage, DSGVO)
 
 ## Bilder tauschen

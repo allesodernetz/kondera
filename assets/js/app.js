@@ -5,6 +5,7 @@
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
   var img = function (k) { return (window.BILDER && window.BILDER[k]) || "assets/img/" + k + ".webp"; };
+  var mob = function (k) { return (window.BILDER && window.BILDER["m/" + k]) || "assets/img/m/" + k + ".webp"; };
   var thumb = function (k) { return (window.BILDER && (window.BILDER["thumb/" + k] || window.BILDER[k])) || "assets/img/thumb/" + k + ".webp"; };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
@@ -124,7 +125,7 @@
       }
       out.push('<div class="sheet-row" style="grid-template-columns:' + cols.join(" ") + '">' + items.map(function (p, j) {
         return '<a class="tile" href="#projekt/' + p.slug + '" data-i="' + shown.indexOf(p) + '">' +
-          '<span class="tile-img" data-par style="aspect-ratio:' + ars[j] + '"><img src="' + thumb(p.bilder[0]) + '" alt="" decoding="async"' + (shown.indexOf(p) < 8 ? "" : ' loading="lazy"') + "></span>" +
+          '<span class="tile-img" data-par style="aspect-ratio:' + ars[j] + '"><picture><source media="(max-width: 640px)" srcset="' + mob(p.bilder[0]) + '"><img src="' + thumb(p.bilder[0]) + '" alt="" decoding="async"' + (shown.indexOf(p) < 8 ? "" : ' loading="lazy"') + "></picture></span>" +
           '<span class="tile-cap"><span class="tile-t">' + esc(p.titel) + '</span><span class="tile-m">' + (p.ort === "Ort folgt" ? "" : esc(p.ort)) + "</span></span></a>";
       }).join("") + (items.length < per ? '<span class="tile-fill"></span>' : "") + "</div>");
     }
