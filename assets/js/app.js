@@ -320,16 +320,21 @@
     }
     // Infos nur, solange der Zeiger auf dem Punkt ist
     function bind(el, i) {
-      el.addEventListener("mouseenter", function () { show(i); });
-      el.addEventListener("mouseleave", function () { hide(i); });
-      el.addEventListener("focus", function () { show(i); });
-      el.addEventListener("blur", function () { hide(i); });
-      el.addEventListener("click", function (e) { e.stopPropagation(); if (!finePointer) { active === i ? hide(i) : show(i); } });
+      if (finePointer) {
+        // Maus: Infos nur, solange der Zeiger auf dem Punkt ist
+        el.addEventListener("mouseenter", function () { show(i); });
+        el.addEventListener("mouseleave", function () { hide(i); });
+        el.addEventListener("focus", function () { show(i); });
+        el.addEventListener("blur", function () { hide(i); });
+        el.addEventListener("click", function (e) { e.stopPropagation(); });
+      } else {
+        // Touch: ein Tipp öffnet, ein zweiter Tipp auf dieselbe Stadt schließt
+        el.addEventListener("click", function (e) { e.stopPropagation(); active === i ? hide(i) : show(i); });
+      }
     }
     groups.forEach(function (g) { bind(g, +g.dataset.i); });
     listBtns.forEach(function (b) { bind(b, +b.dataset.i); });
     document.addEventListener("click", function () { if (active > -1) hide(); });
-    addEventListener("scroll", function () { if (active > -1 && !finePointer) hide(); }, { passive: true });
 
     // Verbindungen vom Büro aus, einmal beim Erscheinen
     var routes = $$(".route", svg);
