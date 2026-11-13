@@ -335,7 +335,29 @@
     listBtns.forEach(function (b) { bind(b, +b.dataset.i); });
     document.addEventListener("click", function () { if (active > -1) hide(); });
 
-    $$(".route", svg).forEach(function (p) { p.removeAttribute("pathLength"); p.classList.add("done"); });
+    // Karte steht sofort, Punkte und Verbindungen erscheinen beim ersten Hereinscrollen
+    var routes = $$(".route", svg);
+    function settle() { routes.forEach(function (p) { p.style.strokeDasharray = ""; p.style.strokeDashoffset = ""; p.style.transition = ""; p.removeAttribute("pathLength"); p.classList.add("done"); }); }
+    if (reduce) { settle(); return; }
+    var others = M.p.filter(function (c) { return c !== base; });
+    groups.forEach(function (g) {
+      var c = M.p[+g.dataset.i], k = others.indexOf(c);
+      var hq = g.classList.contains("hq");
+      g.style.setProperty("--d", (hq ? 0.05 : 0.25 + k * 0.05 + 0.95).toFixed(2) + "s");   // Stadt erscheint, wenn ihre Linie ankommt
+    });
+    routes.forEach(function (p) { p.style.strokeDasharray = "1"; p.style.strokeDashoffset = "1"; });
+    svg.classList.add("pre");
+    var io = new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting) return;
+      svg.classList.add("live");
+      routes.forEach(function (p, i) {
+        p.style.transition = "stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1) " + (0.25 + i * 0.05).toFixed(2) + "s";
+        p.style.strokeDashoffset = "0";
+      });
+      setTimeout(settle, 2600);
+      io.disconnect();
+    }, { threshold: 0.35 });
+    io.observe(wrap);
   })();
 
   /* ---------------- Werdegang ---------------- */

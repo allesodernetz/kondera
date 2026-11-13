@@ -213,6 +213,8 @@ mark{background:var(--paper-2);color:inherit;padding:0 .2em}
 .map .city.hq .dot{fill:var(--paper);stroke:var(--ink);stroke-width:2}
 .map .route{fill:none;stroke:var(--stone);stroke-width:1;opacity:.75}
 .map .route.done{stroke-dasharray:3 4}
+.map.pre .city{opacity:0;transform:scale(0);transform-box:fill-box;transform-origin:center;transition:opacity .3s ease var(--d),transform .5s cubic-bezier(.3,1.6,.5,1) var(--d)}
+.map.pre.live .city{opacity:1;transform:none}
 .map-tip{position:absolute;z-index:3;transform:translate(-50%,calc(-100% - 14px));background:var(--ink);color:var(--on-dark);padding:.55rem .75rem;font-size:.85rem;line-height:1.4;max-width:16rem;pointer-events:none;white-space:normal}
 .map-tip b{display:block;font-weight:500}
 .ort-list sup{font-size:.7em;margin-left:.25em;color:var(--faint)}
