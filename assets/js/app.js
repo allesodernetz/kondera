@@ -150,6 +150,25 @@
   addEventListener("resize", function () { if (perRow() !== lastPer) { lastPer = perRow(); renderSheet(true); } });
   renderFilters(); renderSheet(false);
 
+  // Handy: Zähler und Fortschritt der Wisch-Galerie
+  (function () {
+    var cnt = $(".sp-count"), bar = $(".sp-bar i"), hint = $(".sp-hint"), raf = 0;
+    function upd() {
+      raf = 0;
+      var tiles = $$(".tile", sheet); if (!tiles.length) return;
+      var max = sheet.scrollWidth - sheet.clientWidth, p = max > 0 ? sheet.scrollLeft / max : 1;
+      var w = tiles.length > 1 ? tiles[1].offsetLeft - tiles[0].offsetLeft : 1;
+      var i = clamp(Math.round(sheet.scrollLeft / w), 0, tiles.length - 1);
+      if (p > 0.995) i = tiles.length - 1;
+      cnt.textContent = (i + 1) + " / " + tiles.length;
+      bar.style.transform = "scaleX(" + Math.max(p, 1 / tiles.length).toFixed(3) + ")";
+      if (sheet.scrollLeft > 20) hint.hidden = true;
+    }
+    sheet.addEventListener("scroll", function () { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
+    $(".filters").addEventListener("click", function () { sheet.scrollLeft = 0; requestAnimationFrame(upd); });
+    addEventListener("resize", upd); upd();
+  })();
+
   // Cursor-Label über den Projekten
   (function () {
     if (!finePointer || reduce) return;
